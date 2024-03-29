@@ -1,6 +1,7 @@
 import ipaddress
 from jinja2 import Environment, FileSystemLoader
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
+
 try:
 
     def Site_types():
@@ -11,6 +12,8 @@ _____________________________________________________________________
             [2] Secondary CPE
 ______________________________________________________________________
         ''')
+
+
     env = Environment(loader=FileSystemLoader('Netmiko_Templates'))
     CPE_BGP = env.get_template('packet_prod_bgp_neighbor.txt')
     Lan_interface = env.get_template('packet_prod_LAN_interface.txt')
@@ -64,15 +67,17 @@ ______________________________________________________________________
         CPE_BGP = env5.get_template('packet_prod_bgp_neighbor.txt')
         return CPE_BGP
 
+
     def non_asr_fc_low_bandwidth_p():
         bw_in_bps = int(BW) * 1000000
         fc_Lan_interface = Lan_interface.render(LAN_IP=P_CPE_LAN, LAN_SUBNET=x).split('\n')
-        output = netmiko_connect().send_config_set(classlow().render(Service_Bandwidth=bw_in_bps).split('\n'))
-        output2 = netmiko_connect().send_config_set(qos_interface())
-        output3 = netmiko_connect().send_config_set(fc_Lan_interface)
-        output5 = netmiko_connect().send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
-        output4 = netmiko_connect().send_config_set(snmp())
+        output = netmiko_connect(TIP,usr,pw).send_config_set(classlow().render(Service_Bandwidth=bw_in_bps).split('\n'))
+        output2 = netmiko_connect(TIP,usr,pw).send_config_set(qos_interface())
+        output3 = netmiko_connect(TIP,usr,pw).send_config_set(fc_Lan_interface)
+        output5 = netmiko_connect(TIP,usr,pw).send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
+        output4 = netmiko_connect(TIP,usr,pw).send_config_set(snmp())
         exit()
+
 
     def non_asr_fc_highbandwidth_p():
         bw_in_bps = int(BW) * 1000000
@@ -106,6 +111,7 @@ ______________________________________________________________________
         output4 = netmiko_connect().send_config_set(snmp())
         exit()
 
+
     def Bandwidth(b):
         if b.isdigit():
             return True
@@ -113,15 +119,17 @@ ______________________________________________________________________
             return False
 
 
-    def netmiko_connect():
-        net_connect = ConnectHandler(
-            device_type="cisco_ios",
-            host="10.255.1.142",
-            username="admin",
-            password="admin",
-            timeout='120'
-        )
-        return net_connect
+    def netmiko_connect(Host, user, pwd):
+        try:
+            cisco = {'device_type': 'cisco_ios', 'host': Host, 'username': user, 'password': pwd}
+            net_connect = ConnectHandler(**cisco)
+            return net_connect
+        except NetmikoAuthenticationException:
+            print('Authentication failed with Target Host ' + Host)
+            exit()
+        except NetmikoTimeoutException:
+            print('Target Host is not Reachable ' + Host)
+            exit()
 
 
     Site_types()
@@ -145,6 +153,9 @@ ______________________________________________________________________
                 if Bandwidth(BW) is False:
                     print('Invalid Bandwidth')
                 elif int(BW) <= 10:
+                    TIP = input('Target IP: ')
+                    usr = input('Tacacs Username: ')
+                    pw = input('Password: ')
                     non_asr_fc_low_bandwidth_p()
                 elif int(BW) > 10:
                     non_asr_fc_highbandwidth_p()
