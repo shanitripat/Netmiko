@@ -82,33 +82,33 @@ ______________________________________________________________________
     def non_asr_fc_highbandwidth_p():
         bw_in_bps = int(BW) * 1000000
         fc_Lan_interface = Lan_interface.render(LAN_IP=P_CPE_LAN, LAN_SUBNET=x).split('\n')
-        output = netmiko_connect().send_config_set(classhigh().render(Service_Bandwidth=bw_in_bps).split('\n'))
-        output2 = netmiko_connect().send_config_set(qos_interface())
-        output3 = netmiko_connect().send_config_set(fc_Lan_interface)
-        output5 = netmiko_connect().send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
-        output4 = netmiko_connect().send_config_set(snmp())
+        output = netmiko_connect(TIP,usr,pw).send_config_set(classhigh().render(Service_Bandwidth=bw_in_bps).split('\n'))
+        output2 = netmiko_connect(TIP,usr,pw).send_config_set(qos_interface())
+        output3 = netmiko_connect(TIP,usr,pw).send_config_set(fc_Lan_interface)
+        output5 = netmiko_connect(TIP,usr,pw).send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
+        output4 = netmiko_connect(TIP,usr,pw).send_config_set(snmp())
         exit()
 
 
     def non_asr_fc_low_bandwidth_b():
         bw_in_bps = int(BW) * 1000000
         fc_Lan_interface = Lan_interface.render(LAN_IP=P_CPE_LAN, LAN_SUBNET=x).split('\n')
-        output = netmiko_connect().send_config_set(classlow().render(Service_Bandwidth=bw_in_bps).split('\n'))
-        output2 = netmiko_connect().send_config_set(qos_interface())
-        output3 = netmiko_connect().send_config_set(fc_Lan_interface)
-        output5 = netmiko_connect().send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
-        output4 = netmiko_connect().send_config_set(snmp())
+        output = netmiko_connect(TIP,usr,pw).send_config_set(classlow().render(Service_Bandwidth=bw_in_bps).split('\n'))
+        output2 = netmiko_connect(TIP,usr,pw).send_config_set(qos_interface())
+        output3 = netmiko_connect(TIP,usr,pw).send_config_set(fc_Lan_interface)
+        output5 = netmiko_connect(TIP,usr,pw).send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
+        output4 = netmiko_connect(TIP,usr,pw).send_config_set(snmp())
         exit()
 
 
     def non_asr_fc_highbandwidth_b():
         bw_in_bps = int(BW) * 1000000
         fc_Lan_interface = Lan_interface.render(LAN_IP=P_CPE_LAN, LAN_SUBNET=x).split('\n')
-        output = netmiko_connect().send_config_set(classhigh().render(Service_Bandwidth=bw_in_bps).split('\n'))
-        output2 = netmiko_connect().send_config_set(qos_interface())
-        output3 = netmiko_connect().send_config_set(fc_Lan_interface)
-        output5 = netmiko_connect().send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
-        output4 = netmiko_connect().send_config_set(snmp())
+        output = netmiko_connect(TIP,usr,pw).send_config_set(classhigh().render(Service_Bandwidth=bw_in_bps).split('\n'))
+        output2 = netmiko_connect(TIP,usr,pw).send_config_set(qos_interface())
+        output3 = netmiko_connect(TIP,usr,pw).send_config_set(fc_Lan_interface)
+        output5 = netmiko_connect(TIP,usr,pw).send_config_set(bgp().render(CEBGP1=BGP1, CEBGP2=BGP2).split('\n'))
+        output4 = netmiko_connect(TIP,usr,pw).send_config_set(snmp())
         exit()
 
 
@@ -158,6 +158,9 @@ ______________________________________________________________________
                     pw = input('Password: ')
                     non_asr_fc_low_bandwidth_p()
                 elif int(BW) > 10:
+                    TIP = input('Target IP: ')
+                    usr = input('Tacacs Username: ')
+                    pw = input('Password: ')
                     non_asr_fc_highbandwidth_p()
                 else:
                     break
@@ -180,8 +183,14 @@ ______________________________________________________________________
                 if Bandwidth(BW) is False:
                     print('Invalid Bandwidth')
                 elif int(BW) <= 10:
+                    TIP = input('Target IP: ')
+                    usr = input('Tacacs Username: ')
+                    pw = input('Password: ')
                     non_asr_fc_low_bandwidth_b()
                 elif int(BW) > 10:
+                    TIP = input('Target IP: ')
+                    usr = input('Tacacs Username: ')
+                    pw = input('Password: ')
                     non_asr_fc_highbandwidth_b()
                 else:
                     break
