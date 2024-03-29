@@ -1,0 +1,78 @@
+!
+ip access-list extended Premium-Classify
+  permit ip any any  dscp EF
+  permit ip any any  dscp CS5
+!
+ip access-list extended Business-1-Classify
+  permit ip any any dscp cs4
+  permit ip any any  dscp af41
+  permit ip any any  dscp af42
+  permit ip any any  dscp af43
+!
+ip access-list extended Business-2-Classify
+  permit ip any any dscp cs3
+  permit ip any any dscp cs6
+  permit ip any any dscp cs7
+  permit ip any any dscp af31
+  permit ip any any  dscp af32
+  permit ip any any  dscp af33
+!
+ip access-list extended Business-3-Classify
+  permit ip any any dscp cs2
+  permit ip any any dscp af21
+  permit ip any any dscp af22
+  permit ip any any dscp af23
+!
+ip access-list extended VPN-Default-Classify
+  permit ip any any dscp cs1
+  permit ip any any dscp af12
+  permit ip any any dscp af13
+!
+ip access-list extended Management-Routing-Classify
+  permit ip any 10.82.20.0 0.0.3.255
+  permit ip 10.82.20.0 0.0.3.255 any
+  permit tcp any any eq bgp
+  permit udp any eq rip any eq rip
+!
+class-map match-any Management-Routing-Class
+ match access-group name Management-Routing-Classify
+!
+class-map match-any Premium-Class
+ match access-group name Premium-Classify
+!
+class-map match-any Business-1-Class
+ match access-group name Business-1-Classify
+!
+class-map match-any Business-2-Class
+ match access-group name Business-2-Classify
+!
+class-map match-any Business-3-Class
+ match access-group name Business-3-Classify
+!
+class-map match-any VPN-Default-Class
+ match access-group name VPN-Default-Classify
+!
+policy-map Queue-CE-Manual
+ class Premium-Class
+  priority percent 16
+class Business-1-Class
+  bandwidth percent 40
+  random-detect dscp-based
+class Business-2-Class
+  bandwidth percent 5
+  random-detect dscp-based
+class Business-3-Class
+  bandwidth percent 20
+  random-detect dscp-based
+class Management-Routing-Class
+  bandwidth percent 5
+  set ip dscp af11
+class class-default
+  bandwidth percent 14
+  random-detect dscp-based
+!
+policy-map main
+  class class-default
+    shape average {{ Service_Bandwidth }}
+     service-policy Queue-CE-Manual
+!

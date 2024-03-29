@@ -1,0 +1,33 @@
+ip extcommunity-list 100 permit RT:8220:18150
+ip extcommunity-list 100 permit RT:8220:18160
+ip bgp-community new-format
+ip community-list 20 permit 8220:40001
+!
+route-map CUSTOMER-OUT deny 10
+ match community 20
+route-map CUSTOMER-OUT deny 20
+ match extcommunity 100
+route-map CUSTOMER-OUT permit 30
+!
+router bgp 65505
+ bgp log-neighbor-changes
+ neighbor {{ CEBGP1 }} remote-as 65000
+ neighbor {{ CEBGP1 }} description <EBGP WITH CUSTOMER ROUTER>
+ neighbor {{ CEBGP1 }} password Pwd4ebgp
+ neighbor {{ CEBGP2 }} remote-as 65000
+ neighbor {{ CEBGP2 }} description <EBGP WITH CUSTOMER ROUTER>
+ neighbor {{ CEBGP2 }} password Pwd4ebgp
+!
+address-family ipv4
+  redistribute connected route-map REDISTRIBUTE-CONNECTED
+  redistribute static route-map 65505-TAGGED-STATIC
+  neighbor {{ CEBGP1 }} activate
+  neighbor {{ CEBGP1 }} send-community
+  neighbor {{ CEBGP1 }} route-map CUSTOMER-OUT out
+  neighbor {{ CEBGP1 }} maximum-prefix 5000
+  neighbor {{ CEBGP2 }} activate
+  neighbor {{ CEBGP2 }} send-community
+  neighbor {{ CEBGP2 }} route-map CUSTOMER-OUT out
+  neighbor {{ CEBGP2 }} maximum-prefix 5000
+ exit-address-family
+!

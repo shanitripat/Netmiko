@@ -1,0 +1,5 @@
+interface GigabitEthernet0/3
+ip address {{ LAN_IP }} {{ LAN_SUBNET }}
+speed auto
+duplex auto
+!

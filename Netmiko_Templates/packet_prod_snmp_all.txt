@@ -1,0 +1,16 @@
+access-list 20 permit 10.4.60.4
+access-list 20 permit 10.4.37.165
+access-list 20 permit 10.4.37.164
+access-list 20 permit 10.4.22.242
+!
+snmp-server view cutdown system included
+snmp-server view cutdown interfaces included
+snmp-server view cutdown ifAlias included
+snmp-server group KBL v3 priv read cutdown access 20
+snmp-server user RoUsrWan KBL v3 auth sha Pwd4RoUsrWan- priv aes 128 Pwd4RoUsrWan-
+!
+snmp-server host 10.4.60.4 version 3 priv RoUsrWan
+snmp-server host 10.4.37.165 version 3 priv RoUsrWan
+snmp-server host 10.4.37.164 version 3 priv RoUsrWan
+snmp-server host 10.4.22.242 version 3 priv RoUsrWan
+!
